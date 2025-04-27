@@ -1,4 +1,4 @@
-#include "etc.cc"
+#include "etc.hh"
 
 using namespace etc;
 
