@@ -14,6 +14,7 @@ set(SOURCES
 ${SRC_DIR}/main.cc
 ${SRC_DIR}/etc.cc
 ${SRC_DIR}/operations.cc
+${SRC_DIR}/vizualizer.cc
 )
 
 add_executable(EasyTensor ${SOURCES})
