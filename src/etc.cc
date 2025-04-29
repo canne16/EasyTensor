@@ -6,6 +6,9 @@
 #include <iostream>
 #include <atomic>
 #include <functional>
+#include <stack>
+#include <unordered_map>
+
 
 #include "etc.hh"
 
@@ -23,44 +26,79 @@ BinaryOperation::BinaryOperation(const std::shared_ptr<INode> lhs, const std::sh
     args_.push_back(rhs.get());
 }
 
-std::shared_ptr<IOperation> NeuralNetwork::addOp(std::shared_ptr<IOperation> op) {
-    // Set the parent node as the first argument of the operation, if any
-    const auto& args = op->getArgs();
-    if (!args.empty()) {
-        root_ = std::shared_ptr<INode>(const_cast<INode*>(args[0]), [](INode*){}); // non-owning
+Tensor NeuralNetwork::infer() {
+    std::cout << "[infer] Called infer()\n";
+    if (!root_) {
+        std::cout << "[infer] root_ is null\n";
+        return Tensor{};
     }
-    root_ = op;
+    std::cout << "[infer] root_ is not null, calling evaluate() on node id " << root_->getId() << "\n";
+    return root_->evaluate();
+}
+
+std::shared_ptr<IOperation> NeuralNetwork::addOp(std::shared_ptr<IOperation> op) {
+    std::cout << "[addOp] Adding operation: " << op->getOpName() << " (id=" << op->getId() << ")\n";
+    const auto& args = op->getArgs();
+    if (!root_) {
+        std::cout << "[addOp] root_ is null, setting root_ to op id " << op->getId() << "\n";
+        root_ = op;
+    }
+    for (const INode* arg : args) {
+        std::cout << "[addOp]   arg ptr: " << arg << "\n";
+        if (arg) {
+            std::cout << "[addOp]   adding child to arg id " << arg->getId() << "\n";
+            const_cast<INode*>(arg)->addChild(op.get());
+        } else {
+            std::cout << "[addOp]   arg is null\n";
+        }
+    }
     return op;
 }
 
 void NeuralNetwork::exportGraph(const std::string& filename) const {
+    std::cout << "[exportGraph] Exporting graph to " << filename << ".dot\n";
     std::ofstream file(filename + ".dot");
     file << "digraph NeuralNetwork {\n";
     file << "    rankdir=LR;\n";
     file << "    node [shape=box, style=filled, fillcolor=lightgray];\n";
 
-    std::unordered_set<size_t> visited;
-    std::function<void(const INode*)> dfs = [&](const INode* node) {
-        if (!node || visited.count(node->getId())) return;
-        visited.insert(node->getId());
-        // Use unique node name: node<ID>
-        file << "    node" << node->getId() << " [label=\"" << node->getOpName() << "\"];\n";
+    std::unordered_set<const INode*> all_nodes;
+    std::function<void(const INode*)> collect = [&](const INode* node) {
+        if (!node || all_nodes.count(node)) return;
+        std::cout << "[exportGraph]   collecting node id " << node->getId() << "\n";
+        all_nodes.insert(node);
         for (const INode* child : node->getChildren()) {
-            if (child) {
-                // Use unique node names for edges as well
-                file << "    node" << child->getId() << " -> node" << node->getId() << ";\n";
-                dfs(child);
+            collect(child);
+        }
+        if (auto op = dynamic_cast<const IOperation*>(node)) {
+            for (const INode* arg : op->getArgs()) {
+                collect(arg);
             }
         }
     };
-    dfs(root_.get());
+    collect(root_.get());
+
+    for (const INode* node : all_nodes) {
+        file << "    node" << node->getId()
+             << " [label=\"" << node->getOpName() << "\\n(id=" << node->getId() << ")\"];\n";
+    }
+
+    for (const INode* parent : all_nodes) {
+        for (const INode* child : parent->getChildren()) {
+            if (child && all_nodes.count(child)) {
+                file << "    node" << parent->getId() << " -> node" << child->getId() << ";\n";
+            }
+        }
+    }
 
     file << "}\n";
     file.close();
 
     std::string command = "dot -Tsvg " + filename + ".dot -o " + filename + ".svg";
+    std::cout << "[exportGraph] Running: " << command << "\n";
     system(command.c_str());
     std::cout << "Generated: " << filename << ".svg\n";
 }
+
 
 }
