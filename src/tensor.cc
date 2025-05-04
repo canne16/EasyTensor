@@ -51,7 +51,6 @@ Tensor Tensor::operator/(const Tensor& other) const {
     return Tensor(result);
 }
 
-// Standard matrix multiplication
 Tensor Tensor::matmul(const Tensor& other) const {
     if (values.empty() || other.values.empty() || values[0].size() != other.values.size())
         throw std::invalid_argument("Invalid shapes for matrix multiplication");
@@ -66,9 +65,8 @@ Tensor Tensor::matmul(const Tensor& other) const {
     return Tensor(result);
 }
 
-
 std::ostream& operator<<(std::ostream& os, const Tensor& t) {
-    os << "[";
+    os << "\n[";
     for (size_t i = 0; i < t.values.size(); ++i) {
         os << "[";
         for (size_t j = 0; j < t.values[i].size(); ++j) {
@@ -76,9 +74,9 @@ std::ostream& operator<<(std::ostream& os, const Tensor& t) {
             if (j + 1 < t.values[i].size()) os << ", ";
         }
         os << "]";
-        if (i + 1 < t.values.size()) os << ", ";
+        if (i + 1 < t.values.size()) os << "\n";
     }
-    os << "]";
+    os << "]\n";
     return os;
 }
 

@@ -52,6 +52,7 @@ std::shared_ptr<IOperation> NeuralNetwork::addOp(std::shared_ptr<IOperation> op)
             std::cout << "[addOp]   arg is null\n";
         }
     }
+    root_ = op;
     return op;
 }
 
@@ -94,10 +95,12 @@ void NeuralNetwork::exportGraph(const std::string& filename) const {
     file << "}\n";
     file.close();
 
-    std::string command = "dot -Tsvg " + filename + ".dot -o " + filename + ".svg";
-    std::cout << "[exportGraph] Running: " << command << "\n";
-    system(command.c_str());
-    std::cout << "Generated: " << filename << ".svg\n";
+    std::string command1 = "dot -Tsvg " + filename + ".dot -o " + filename + ".svg";
+    std::cout << "[exportGraph] Running: " << command1 << "\n";
+    system(command1.c_str());
+    std::cout << "[exportGraph] Generated: " << filename << ".svg\n";
+    std::string command2 = "xdg-open " + filename + ".svg";
+    system(command2.c_str());
 }
 
 
