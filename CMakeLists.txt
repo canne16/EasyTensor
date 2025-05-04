@@ -15,7 +15,6 @@ ${SRC_DIR}/main.cc
 ${SRC_DIR}/etc.cc
 ${SRC_DIR}/tensor.cc
 ${SRC_DIR}/operations.cc
-${SRC_DIR}/vizualizer.cc
 )
 
 add_executable(EasyTensor ${SOURCES})
@@ -35,7 +34,10 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 add_executable(runTests 
-                        tests/test_main.cpp
+                        tests/test_main.cc
+                        tests/test_tensor.cc
+                        tests/test_operations.cc
+                        tests/test_etc.cc
               )
 
 target_compile_definitions(runTests PRIVATE TESTING)
