@@ -37,6 +37,21 @@ cmake ..
 cmake --build .
 ```
 
+## Running Tests
+
+After building, you can run the tests using:
+
+```bash
+cd build
+ctest
+```
+
+or directly:
+
+```bash
+./runTests
+```
+
 ## Usage
 
 A typical usage example (see `src/main.cc`):
