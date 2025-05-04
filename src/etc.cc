@@ -27,29 +27,45 @@ BinaryOperation::BinaryOperation(const std::shared_ptr<INode> lhs, const std::sh
 }
 
 Tensor NeuralNetwork::infer() {
+    #ifndef TESTING
     std::cout << "[infer] Called infer()\n";
+    #endif
     if (!root_) {
+        #ifndef TESTING
         std::cout << "[infer] root_ is null\n";
+        #endif
         return Tensor{};
     }
+    #ifndef TESTING
     std::cout << "[infer] root_ is not null, calling evaluate() on node id " << root_->getId() << "\n";
+    #endif
     return root_->evaluate();
 }
 
 std::shared_ptr<IOperation> NeuralNetwork::addOp(std::shared_ptr<IOperation> op) {
+    #ifndef TESTING
     std::cout << "[addOp] Adding operation: " << op->getOpName() << " (id=" << op->getId() << ")\n";
+    #endif
     const auto& args = op->getArgs();
     if (!root_) {
+        #ifndef TESTING
         std::cout << "[addOp] root_ is null, setting root_ to op id " << op->getId() << "\n";
+        #endif
         root_ = op;
     }
     for (const INode* arg : args) {
+        #ifndef TESTING
         std::cout << "[addOp]   arg ptr: " << arg << "\n";
+        #endif
         if (arg) {
+            #ifndef TESTING
             std::cout << "[addOp]   adding child to arg id " << arg->getId() << "\n";
+            #endif
             const_cast<INode*>(arg)->addChild(op.get());
         } else {
+            #ifndef TESTING
             std::cout << "[addOp]   arg is null\n";
+            #endif
         }
     }
     root_ = op;

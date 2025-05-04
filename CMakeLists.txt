@@ -34,6 +34,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 add_executable(runTests 
+                        ${SRC_DIR}/etc.cc
+                        ${SRC_DIR}/tensor.cc
+                        ${SRC_DIR}/operations.cc
                         tests/test_main.cc
                         tests/test_tensor.cc
                         tests/test_operations.cc
