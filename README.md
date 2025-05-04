@@ -19,6 +19,15 @@ git clone https://github.com/yourusername/EasyTensor.git
 cd EasyTensor
 ```
 
+**Dependency:**  
+To use the graph export/visualization feature (`NeuralNetwork::exportGraph`), you need [Graphviz](https://graphviz.gitlab.io/) installed and `dot` available in your PATH.
+
+On Ubuntu/Debian:
+
+```bash
+sudo apt-get install graphviz
+```
+
 Build with CMake:
 
 ```bash
